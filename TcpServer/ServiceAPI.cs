@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.DirectoryServices.AccountManagement;
 using System.Runtime.InteropServices;
 
 namespace TcpServer
@@ -47,7 +49,7 @@ namespace TcpServer
             return $"Password is changed!";
         }
 
-        public string AddUser(string user)
+        public string AddUser(string admin, string pass, string user)
         {
             const int UF_DONT_EXPIRE_PASSWD = 0x10000;
             //const int UF_ACCOUNTDISABLE = 0x000002;
@@ -72,6 +74,16 @@ namespace TcpServer
                 flag = UF_DONT_EXPIRE_PASSWD,
                 scriptpath = ""
             };
+
+            using (PrincipalContext _ctx = new PrincipalContext(ContextType.Machine))
+            {
+                if (!_ctx.ValidateCredentials(admin, pass))
+                    return $"Invalid authencation!";
+
+                UserPrincipal _priv = UserPrincipal.FindByIdentity(_ctx, IdentityType.SamAccountName, admin);
+                if (!_priv.GetAuthorizationGroups().Any(p => p.ToString() == "Administrators"))
+                    return $"Invalid authencation!";
+            }
 
             int output;
             int r = NetUserAdd("127.0.0.1", 1, ref userInfo1, out output);

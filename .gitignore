@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/WinService/v15
+/Caller
+/TcpServer/bin/Debug
+/TcpServer/obj/Debug
+/WinService/bin/Debug
+/WinService/obj/Debug
